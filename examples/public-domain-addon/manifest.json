@@ -1,9 +1,0 @@
-{
-  "id": "org.astraplay.public-domain",
-  "name": "Open Cinema Archive",
-  "version": "1.0.0",
-  "description": "A protocol example for public-domain and creator-authorized demo media.",
-  "author": "AstraPlay Labs",
-  "resources": ["catalog", "meta", "stream", "subtitles"],
-  "types": ["movie", "series"]
-}

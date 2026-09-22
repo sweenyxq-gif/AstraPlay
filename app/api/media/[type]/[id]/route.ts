@@ -1,6 +1,2 @@
 import { NextResponse } from "next/server";
-import { findMedia } from "@/mocks/media";
-export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return NextResponse.json(findMedia(id));
-}
+export const GET = () => NextResponse.json({ code: "NO_LOCAL_CATALOG", message: "Metadata must come from an installed addon." }, { status: 404 });

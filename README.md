@@ -18,7 +18,6 @@ Quality gates: `npm run typecheck`, `npm run lint`, `npm test`, and `npm run bui
 - `packages/shared/` — domain models
 - `packages/addon-types/` — runtime schemas and shared types
 - `packages/addon-sdk/` — ergonomic addon registration API
-- `mocks/` — isolated development catalogs
 - `examples/public-domain-addon/` — controlled legal protocol example
 - `docs/` — architecture, security, development, and addon protocol
 

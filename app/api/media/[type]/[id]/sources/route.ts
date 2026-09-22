@@ -1,3 +1,2 @@
 import { NextResponse } from "next/server";
-import { sources } from "@/mocks/media";
-export const GET = () => NextResponse.json({ items: sources, cacheTtlSeconds: 120 });
+export const GET = () => NextResponse.json({ items: [], cacheTtlSeconds: 0, message: "Sources must come from an installed addon." });

@@ -15,7 +15,7 @@ Provider credentials and extraction behavior never enter React components. Exter
 - Next.js provides the web shell and typed route boundaries.
 - Shared TypeScript models prevent UI/API drift.
 - Remote HTTP addons are data-only; arbitrary addon JavaScript is never run in the browser.
-- Mock metadata lives only in `mocks/` and is replaceable behind the metadata port.
+- The app ships without catalog metadata; visible records come from installed addons behind the metadata port.
 
 ## Compatibility
 
