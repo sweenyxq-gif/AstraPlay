@@ -1,0 +1,19 @@
+import type { AddonManifest, MediaItem, StreamSource } from "@/packages/shared/src/models";
+
+export const media: MediaItem[] = [
+  { id: "signal-sea", type: "movie", title: "The Signal Sea", eyebrow: "Astra Original", description: "A cartographer follows a transmission across an unmapped ocean and discovers a horizon that should not exist.", year: 2026, rating: 8.7, runtime: "2h 14m", genres: ["Science Fiction", "Mystery"], palette: ["#213944", "#8a6848"], glyph: "SS", progress: 42 },
+  { id: "winter-orbit", type: "series", title: "Winter Orbit", eyebrow: "New series", description: "A remote observatory receives a message decades ahead of schedule.", year: 2026, rating: 8.4, runtime: "8 episodes", genres: ["Drama", "Sci-Fi"], palette: ["#25384d", "#6e7c88"], glyph: "WO", progress: 68 },
+  { id: "paper-kingdom", type: "movie", title: "Paper Kingdom", eyebrow: "Critics' pick", description: "A conservator uncovers a city hidden inside a collection of impossible maps.", year: 2025, rating: 8.1, runtime: "1h 56m", genres: ["Adventure", "Drama"], palette: ["#4c3529", "#b48b57"], glyph: "PK" },
+  { id: "last-light", type: "movie", title: "Last Light", eyebrow: "Trending", description: "On the longest night, a lighthouse keeper makes contact with tomorrow.", year: 2024, rating: 7.9, runtime: "1h 49m", genres: ["Thriller"], palette: ["#182834", "#ba6e42"], glyph: "LL" },
+  { id: "still-country", type: "series", title: "Still Country", eyebrow: "Season 2", description: "Three families rebuild a mountain town after the roads disappear.", year: 2025, rating: 8.6, runtime: "16 episodes", genres: ["Drama"], palette: ["#3d4539", "#9d855e"], glyph: "SC", progress: 21 },
+  { id: "glass-archive", type: "series", title: "The Glass Archive", eyebrow: "Top rated", description: "Every memory is catalogued. One archivist finds the shelf that contains her future.", year: 2026, rating: 9.0, runtime: "6 episodes", genres: ["Mystery", "Drama"], palette: ["#18363d", "#66918e"], glyph: "GA" },
+  { id: "north-of-dawn", type: "movie", title: "North of Dawn", eyebrow: "Recently added", description: "A winter expedition traces a warm current into an uncharted valley.", year: 2023, rating: 7.7, runtime: "2h 03m", genres: ["Adventure"], palette: ["#34434f", "#9aa8aa"], glyph: "ND" },
+  { id: "quiet-machines", type: "movie", title: "Quiet Machines", eyebrow: "Festival selection", description: "A sound engineer records the final night of a city learning to sleep.", year: 2025, rating: 8.2, runtime: "1h 44m", genres: ["Drama"], palette: ["#312f39", "#8a765f"], glyph: "QM" },
+  { id: "tideline", type: "series", title: "Tideline", eyebrow: "New episodes", description: "A marine rescue team works the coast where the maps change each morning.", year: 2024, rating: 8.0, runtime: "12 episodes", genres: ["Drama", "Adventure"], palette: ["#19445b", "#5f8d8b"], glyph: "TL" },
+];
+export const demoAddon: AddonManifest = { id: "org.astraplay.public-domain", name: "Open Cinema Archive", version: "1.0.0", description: "A controlled example addon for public-domain and creator-authorized demo media.", author: "AstraPlay Labs", resources: ["catalog", "meta", "stream", "subtitles"], types: ["movie", "series"] };
+export const sources: StreamSource[] = [
+  { id: "oa-1080", addonId: demoAddon.id, provider: "Open Cinema Archive", title: "1080p WEB-DL", quality: "1080p", format: "HLS", language: "English", size: "2.3 GB", url: "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/hls.m3u8" },
+  { id: "oa-720", addonId: demoAddon.id, provider: "Open Cinema Archive", title: "720p Web", quality: "720p", format: "MP4", language: "English", size: "1.1 GB", url: "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/hls.m3u8" },
+];
+export const findMedia = (id: string) => media.find((item) => item.id === id) ?? media[0];
