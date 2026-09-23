@@ -26,25 +26,25 @@ export default function NotFound() {
 
       <main className="not-found-page">
         <div className="not-found-content">
-          <div className="not-found-glitch">404</div>
+          <div className="not-found-glitch font-mono" style={{ color: "var(--brand-accent)", letterSpacing: "0.2em" }}>404</div>
           <div className="not-found-icon">
             <Film size={44} />
           </div>
-          <h1>Lost in the Stream</h1>
+          <h1 style={{ fontFamily: "var(--font-display)", letterSpacing: "0.04em", fontSize: "3rem" }}>REEL MISSING FROM VAULT</h1>
           <p>
-            The title, route, or stream you are looking for does not exist, has moved,
-            or the connected addon returned an invalid locator.
+            The projectionist checked every can in the booth. This print was cut from the reel,
+            spliced away, or never struck.
           </p>
 
           <div className="not-found-actions">
             <Button asChild className="primary-action">
               <Link href="/">
-                <Home /> Back to Home
+                <Home /> Return to Lobby
               </Link>
             </Button>
-            <Button asChild variant="secondary">
+            <Button asChild variant="secondary" className="secondary-action">
               <Link href="/discover">
-                <Compass /> Explore Catalogs
+                <Compass /> Explore Archive
               </Link>
             </Button>
             <Button asChild variant="outline">

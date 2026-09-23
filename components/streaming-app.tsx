@@ -43,7 +43,9 @@ import {
   X,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
+import { FilmLeader } from "@/components/film-leader";
 import { Footer } from "@/components/footer";
+import { MarqueeTicker } from "@/components/marquee-ticker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -466,19 +468,18 @@ function HomeView() {
     <AppShell activePath="/">
       <main>
         {loading ? (
-          <div className="home-loading-screen">
-            <LoaderCircle className="spin" />
-            <p>Connecting to installed Stremio & CloudStream addons…</p>
+          <div className="home-loading-screen" style={{ minHeight: "70vh", display: "grid", placeItems: "center" }}>
+            <FilmLeader text="THREADING 35MM ARCHIVAL REELS..." />
           </div>
         ) : !hasAddons ? (
           <div className="standard-page home-empty">
             <section className="empty-catalog">
               <Sparkles />
-              <span className="kicker">Out-of-the-Box Streaming</span>
-              <h2>Start with verified addons.</h2>
+              <span className="kicker">Archival Projection Booth</span>
+              <h2>Start with verified 35mm addons.</h2>
               <p>
                 AstraPlay connects to remote Stremio and CloudStream providers for
-                real-time catalogs, rich metadata, subtitles, and streams.
+                real-time catalogs, archival metadata, subtitles, and streams.
               </p>
               <div className="empty-actions">
                 <Button onClick={handleQuickInstallPresets} className="primary-action">
@@ -492,6 +493,7 @@ function HomeView() {
           </div>
         ) : (
           <>
+            <MarqueeTicker />
             {heroMeta && (
               <section className="hero">
                 <div
@@ -566,7 +568,10 @@ function HomeView() {
                 <section className="rail-section">
                   <div className="section-heading">
                     <div className="heading-left">
-                      <h2>Continue Watching</h2>
+                      <div className="section-title-wrap">
+                        <span className="section-num">00 /</span>
+                        <h2>Continue Watching</h2>
+                      </div>
                     </div>
                     <div className="rail-controls">
                       <Link
@@ -642,15 +647,20 @@ function HomeView() {
                 const railKey = `rail-${idx}`;
                 const discoverHref = `/discover?addon=${encodeURIComponent(rail.addonUrl)}&type=${encodeURIComponent(rail.type)}&id=${encodeURIComponent(rail.catalogId)}`;
                 return (
-                  <section className="rail-section" key={`${rail.title}-${idx}`}>
-                    <div className="section-heading">
-                      <div className="heading-left">
-                        <h2>{rail.title}</h2>
-                        <span className="addon-tag">{rail.addonName}</span>
-                      </div>
-                      <div className="rail-controls">
-                        <Link
-                          href={discoverHref}
+                  <React.Fragment key={`${rail.title}-${idx}`}>
+                    {(idx > 0 || continueWatching.length > 0) && <div className="sprocket-divider" />}
+                    <section className="rail-section">
+                      <div className="section-heading">
+                        <div className="heading-left">
+                          <div className="section-title-wrap">
+                            <span className="section-num">{String(idx + 1).padStart(2, "0")} /</span>
+                            <h2>{rail.title}</h2>
+                          </div>
+                          <span className="addon-tag">{rail.addonName}</span>
+                        </div>
+                        <div className="rail-controls">
+                          <Link
+                            href={discoverHref}
                           className="see-all-link"
                           onClick={(e) => handleNavigate(discoverHref, e)}
                         >
@@ -725,6 +735,7 @@ function HomeView() {
                       </div>
                     </div>
                   </section>
+                </React.Fragment>
                 );
               })}
             </div>
@@ -1053,16 +1064,16 @@ function SearchView() {
         </div>
 
         {searching && (
-          <div className="loading-line">
-            <LoaderCircle className="spin" /> Searching connected sources…
+          <div style={{ display: "flex", justifyContent: "center", padding: "3rem 0" }}>
+            <FilmLeader text="SEARCHING THE ARCHIVAL VAULT..." />
           </div>
         )}
 
         {!searching && hasSearched && results.length === 0 && (
           <div className="addon-empty">
             <Film />
-            <strong>No results for “{query}”</strong>
-            <p>Try searching for a different title or install additional catalogs.</p>
+            <strong>Nothing under “{query}” in the vault</strong>
+            <p>Checked every film can on the shelf. Try searching an alternate title, year, or director.</p>
           </div>
         )}
 
@@ -1316,103 +1327,152 @@ function StremioDetailsView({
   return (
     <AppShell activePath="/discover">
       <main className="details-page">
-        {/* Cinematic Backdrop */}
-        <div className="detail-backdrop">
-          <div
-            className="hero-image"
-            style={{
-              backgroundImage: meta?.background
-                ? `url(${meta.background})`
-                : meta?.poster
-                ? `url(${meta.poster})`
-                : undefined,
-              backgroundSize: "cover",
-              backgroundPosition: "center 20%",
-            }}
-          />
-        </div>
-
-        {/* Overview Header */}
-        <div className="detail-overview">
-          <div className="detail-poster-wrap">
-            <button
-              type="button"
-              className="detail-back-btn"
-              onClick={() => router.back()}
-              aria-label="Go back"
-            >
-              <ArrowLeft size={16} /> Back
-            </button>
-            <div
-              className="poster-art detail-poster"
-              style={{
-                backgroundImage: meta?.poster ? `url(${meta.poster})` : undefined,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              {!meta?.poster && (
-                <span className="poster-glyph">{meta?.name?.charAt(0) ?? "A"}</span>
-              )}
-            </div>
+        {loadingMeta ? (
+          <div style={{ minHeight: "75vh", display: "grid", placeItems: "center" }}>
+            <FilmLeader text="RETRIEVING ARCHIVAL PRINT FROM VAULT..." />
           </div>
-
-          <div className="detail-copy">
-            <span className="kicker">
-              {meta?.type === "series" ? "TV Series" : "Feature Film"}
-            </span>
-            <h1>{loadingMeta ? "Loading title…" : meta?.name}</h1>
-
-            <div className="meta-line">
-              {meta?.releaseInfo && <span>{formatReleaseInfo(meta.releaseInfo)}</span>}
-              {meta?.imdbRating && (
-                <span className="rating-badge">★ {meta.imdbRating} IMDb</span>
-              )}
-              {meta?.runtime && <span>{meta.runtime}</span>}
-            </div>
-
-            {meta?.genres && (
-              <div className="genre-row">
-                {meta.genres.map((g) => (
-                  <span key={g}>{g}</span>
-                ))}
-              </div>
-            )}
-
-            <p>{meta?.description || "Metadata fetched from installed addons."}</p>
-
-            <div className="hero-actions">
-              <Button
-                className="primary-action"
-                onClick={() => {
-                  const targetId =
-                    meta?.type === "series" && selectedEpisode
-                      ? selectedEpisode.id
-                      : mediaId;
-                  void fetchStreamsForTarget(targetId);
+        ) : (
+          <>
+            {/* Cinematic Backdrop */}
+            <div className="detail-backdrop">
+              <div
+                className="hero-image"
+                style={{
+                  backgroundImage: meta?.background
+                    ? `url(${meta.background})`
+                    : meta?.poster
+                    ? `url(${meta.poster})`
+                    : undefined,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center 20%",
                 }}
-              >
-                <Play /> Stream Now
-              </Button>
-
-              <Button
-                variant="secondary"
-                className="secondary-action"
-                onClick={handleToggleWatchlist}
-              >
-                {inWatchlist ? (
-                  <>
-                    <BookmarkCheck /> In Watchlist
-                  </>
-                ) : (
-                  <>
-                    <Bookmark /> Add to Watchlist
-                  </>
-                )}
-              </Button>
+              />
             </div>
-          </div>
-        </div>
+
+            {/* Vintage Ticket-Stub Layout */}
+            <div className="detail-shell">
+              <div className="ticket-stub-card">
+                {/* Poster Side */}
+                <div className="ticket-poster-side">
+                  <button
+                    type="button"
+                    className="detail-back-btn back-action-floating"
+                    onClick={() => router.back()}
+                    aria-label="Go back"
+                  >
+                    <ArrowLeft size={16} /> Back
+                  </button>
+                  <div
+                    className="ticket-poster"
+                    style={{
+                      backgroundImage: meta?.poster ? `url(${meta.poster})` : undefined,
+                    }}
+                  >
+                    {!meta?.poster && (
+                      <span className="poster-glyph">{meta?.name?.charAt(0) ?? "A"}</span>
+                    )}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: "1rem",
+                        left: "1rem",
+                        background: "rgba(16, 13, 11, 0.9)",
+                        border: "1px solid var(--line-strong)",
+                        padding: "0.25rem 0.6rem",
+                        borderRadius: "2px",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "0.7rem",
+                        letterSpacing: "0.1em",
+                        color: "var(--brand-accent)",
+                        zIndex: 2,
+                      }}
+                    >
+                      {meta?.type === "series" ? "16MM / 1.78:1" : "35MM / 1.85:1"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ticket Info Body */}
+                <div className="ticket-info-body">
+                  <span className="kicker">
+                    {meta?.type === "series" ? "Repertory Series" : "Archival Feature"}
+                  </span>
+                  <h1>{meta?.name}</h1>
+
+                  {/* Technical Monospace Specs Strip */}
+                  <div className="ticket-specs-strip">
+                    {meta?.releaseInfo && <span>YEAR: {formatReleaseInfo(meta.releaseInfo)}</span>}
+                    {meta?.imdbRating && <span>RATING: ★ {meta.imdbRating}</span>}
+                    {meta?.runtime && <span>RUNTIME: {meta.runtime}</span>}
+                    <span>GAUGE: {meta?.type === "series" ? "16MM" : "35MM"}</span>
+                    <span>AUDIO: STEREO</span>
+                  </div>
+
+                  {meta?.genres && (
+                    <div className="ticket-genres">
+                      {meta.genres.map((g) => (
+                        <span key={g} className="ticket-genre-tag">
+                          {g}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <p className="ticket-overview">
+                    {meta?.description || "Archival print sourced from connected providers."}
+                  </p>
+                </div>
+
+                {/* Perforation Divider with Punch Notches */}
+                <div className="ticket-perforation-divider" aria-hidden="true">
+                  <div className="ticket-punch-notch top" />
+                  <div className="ticket-punch-notch bottom" />
+                </div>
+
+                {/* Action Stub */}
+                <div className="ticket-action-stub">
+                  <div className="stub-header">
+                    <span className="stub-title">ADMIT ONE</span>
+                    <span className="stub-code">NO. {meta?.id?.slice(0, 8).toUpperCase() || "7701-A"}</span>
+                  </div>
+
+                  <div className="stub-buttons">
+                    <Button
+                      className="primary-action"
+                      onClick={() => {
+                        const targetId =
+                          meta?.type === "series" && selectedEpisode
+                            ? selectedEpisode.id
+                            : mediaId;
+                        void fetchStreamsForTarget(targetId);
+                      }}
+                    >
+                      <Play /> Roll Reel
+                    </Button>
+
+                    <Button
+                      variant="secondary"
+                      className="secondary-action"
+                      onClick={handleToggleWatchlist}
+                    >
+                      {inWatchlist ? (
+                        <>
+                          <BookmarkCheck /> Ticket Saved
+                        </>
+                      ) : (
+                        <>
+                          <Bookmark /> Save Ticket
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  <span className="stub-code">ASTRA CINEMA · MIDNIGHT</span>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Series Episode Picker */}
         {meta?.type === "series" && seasons.length > 0 && (
@@ -2118,8 +2178,8 @@ function LibraryView() {
             {progressList.length === 0 ? (
               <div className="addon-empty">
                 <Clock />
-                <strong>No active watch history</strong>
-                <p>Start streaming any movie or series to see resume points here.</p>
+                <strong>The booth has no record of your screenings</strong>
+                <p>Grab a seat in the dark. Start streaming any print to track your reels here.</p>
                 <Button asChild className="primary-action">
                   <Link href="/discover">Browse Titles</Link>
                 </Button>
@@ -2194,8 +2254,8 @@ function LibraryView() {
             {watchlist.length === 0 ? (
               <div className="addon-empty">
                 <Bookmark />
-                <strong>Your watchlist is empty</strong>
-                <p>Add titles from any details page to save them for later.</p>
+                <strong>No ticket stubs in your pocket</strong>
+                <p>The projector is idling. Save titles from any screening page to line up your queue.</p>
                 <Button asChild className="primary-action">
                   <Link href="/discover" onClick={(e) => { e.preventDefault(); router.push("/discover"); }}>Discover Titles</Link>
                 </Button>
