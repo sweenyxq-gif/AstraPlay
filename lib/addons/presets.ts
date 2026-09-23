@@ -40,15 +40,15 @@ export const PRESET_ADDONS: StoredAddon[] = [
   },
   {
     kind: "stremio",
-    id: "org.publicdomain.movies",
-    name: "Public Domain & Open Streams",
-    version: "1.2.0",
-    description: "Verified public domain movies, open films (Blender Open Projects), and direct streaming sources.",
-    url: "https://v3-cinemeta.strem.io/manifest.json",
+    id: "org.astraplay.publicdomain",
+    name: "Public Domain & Open Cinema",
+    version: "2.0.0",
+    description: "Verified genuine public domain classics, open-source cinema (Blender Open Projects), and Internet Archive films.",
+    url: "https://astraplay.onrender.com/api/addons/publicdomain/manifest.json",
     capabilities: ["catalog", "meta", "stream"],
     enabled: true,
     catalogs: [
-      { type: "movie", id: "top", name: "Public Domain Feature Films" },
+      { type: "movie", id: "public_domain", name: "Public Domain Feature Films" },
     ],
   },
   {
@@ -84,8 +84,35 @@ export function getInstalledAddons(): StoredAddon[] {
       localStorage.setItem("astraplay:addons", JSON.stringify(PRESET_ADDONS));
       return PRESET_ADDONS;
     }
-    const parsed = JSON.parse(raw) as StoredAddon[];
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : PRESET_ADDONS;
+    let parsed = JSON.parse(raw) as StoredAddon[];
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      localStorage.setItem("astraplay:addons", JSON.stringify(PRESET_ADDONS));
+      return PRESET_ADDONS;
+    }
+
+    // Auto-migrate legacy public domain preset if misconfigured to Cinemeta
+    let modified = false;
+    parsed = parsed.map((addon) => {
+      if (
+        addon.id === "org.publicdomain.movies" ||
+        addon.id === "org.astraplay.publicdomain" ||
+        addon.name.toLowerCase().includes("public domain")
+      ) {
+        if (
+          addon.url.includes("v3-cinemeta.strem.io") ||
+          addon.catalogs?.[0]?.id === "top"
+        ) {
+          modified = true;
+          return PRESET_ADDONS.find((a) => a.id === "org.astraplay.publicdomain")!;
+        }
+      }
+      return addon;
+    });
+
+    if (modified) {
+      localStorage.setItem("astraplay:addons", JSON.stringify(parsed));
+    }
+    return parsed;
   } catch {
     return PRESET_ADDONS;
   }

@@ -43,6 +43,7 @@ import {
   X,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
+import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -246,6 +247,62 @@ function MobileNav({ activePath }: { activePath?: string }) {
   );
 }
 
+function formatAirDate(raw?: string): string {
+  if (!raw) return "";
+  try {
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return raw;
+    return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  } catch {
+    return raw;
+  }
+}
+
+function formatReleaseInfo(raw?: string): string {
+  if (!raw) return "";
+  const cleaned = raw.replace(/\?/g, "–").trim();
+  const currentYear = new Date().getFullYear();
+  const match = cleaned.match(/^(\d{4})\s*[-–]\s*(\d{4})$/);
+  if (match) {
+    const startYear = parseInt(match[1], 10);
+    const endYear = parseInt(match[2], 10);
+    if (endYear > currentYear) {
+      return `${startYear}–present`;
+    }
+    return `${startYear}–${endYear}`;
+  }
+  return cleaned;
+}
+
+const PROMO_KEYWORDS = [
+  "donation needed",
+  "donation",
+  "donate",
+  "discord",
+  "telegram",
+  "t.me/",
+  "join our",
+  "buy debrid",
+  "real-debrid",
+  "alldebrid",
+  "premium only",
+  "subscribe to",
+  "no stream",
+  "join the discord",
+];
+
+function isPromoOrInvalidStream(s: RemoteStream): boolean {
+  const title = (s.title || s.name || "").toLowerCase();
+  const desc = (s.description || "").toLowerCase();
+  if (PROMO_KEYWORDS.some((kw) => title.includes(kw) || desc.includes(kw))) {
+    return true;
+  }
+  if (!s.url && !s.infoHash && !s.ytId) {
+    return true;
+  }
+  return false;
+}
+
 function AppShell({
   children,
   minimal = false,
@@ -259,6 +316,7 @@ function AppShell({
     <div className={`app-shell ${minimal ? "minimal" : ""}`}>
       {!minimal && <Header activePath={activePath} />}
       {children}
+      {!minimal && <Footer />}
       {!minimal && <MobileNav activePath={activePath} />}
     </div>
   );
@@ -821,7 +879,8 @@ function DiscoverView() {
                 {addons.map((addon) => (
                   <button
                     key={addon.id}
-                    className={selectedAddonUrl === addon.url ? "active" : ""}
+                    type="button"
+                    className={`filter-btn ${selectedAddonUrl === addon.url ? "active" : ""}`}
                     onClick={() => handleAddonChange(addon.url)}
                   >
                     {addon.name}
@@ -831,13 +890,15 @@ function DiscoverView() {
 
               <div className="filter-types">
                 <button
-                  className={selectedType === "movie" ? "active" : ""}
+                  type="button"
+                  className={`filter-btn ${selectedType === "movie" ? "active" : ""}`}
                   onClick={() => handleTypeChange("movie")}
                 >
                   Movies
                 </button>
                 <button
-                  className={selectedType === "series" ? "active" : ""}
+                  type="button"
+                  className={`filter-btn ${selectedType === "series" ? "active" : ""}`}
                   onClick={() => handleTypeChange("series")}
                 >
                   Series
@@ -976,7 +1037,6 @@ function SearchView() {
         <div className="search-field standalone">
           <Search />
           <input
-            autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search movies, TV shows, anime, creators…"
@@ -1112,6 +1172,10 @@ function StremioDetailsView({
       if (!active) return;
       if (foundMeta) {
         setMeta(foundMeta);
+        if (typeof document !== "undefined") {
+          const cleanYear = formatReleaseInfo(foundMeta.releaseInfo || (foundMeta.year ? String(foundMeta.year) : ""));
+          document.title = `${foundMeta.name}${cleanYear ? ` (${cleanYear})` : ""} — AstraPlay`;
+        }
         // If series with videos, default to first season and first episode
         if (foundMeta.type === "series" && foundMeta.videos?.length) {
           const first = foundMeta.videos[0];
@@ -1165,6 +1229,7 @@ function StremioDetailsView({
           if (!res.ok) return;
           const data = (await res.json()) as { streams?: RemoteStream[] };
           for (const s of data.streams ?? []) {
+            if (isPromoOrInvalidStream(s)) continue;
             resolved.push({
               ...s,
               addonName: addon.name,
@@ -1185,7 +1250,7 @@ function StremioDetailsView({
         name: "Open Cinema CDN",
         title: "Standard Web Stream (1080p)",
         url: fallbackUrl,
-        addonName: "Public Domain & Open Streams",
+        addonName: "Public Domain & Open Cinema",
         quality: "1080p",
       });
     }
@@ -1299,7 +1364,7 @@ function StremioDetailsView({
             <h1>{loadingMeta ? "Loading title…" : meta?.name}</h1>
 
             <div className="meta-line">
-              {meta?.releaseInfo && <span>{meta.releaseInfo}</span>}
+              {meta?.releaseInfo && <span>{formatReleaseInfo(meta.releaseInfo)}</span>}
               {meta?.imdbRating && (
                 <span className="rating-badge">★ {meta.imdbRating} IMDb</span>
               )}
@@ -1371,6 +1436,12 @@ function StremioDetailsView({
               {episodesInSeason.map((ep) => {
                 const epNum = ep.number ?? ep.episode ?? 1;
                 const isSelected = selectedEpisode?.id === ep.id;
+                const rawTitle = ep.title || ep.name || "";
+                const cleanTitle =
+                  !rawTitle || rawTitle === String(epNum) || rawTitle === `Episode ${epNum}`
+                    ? `Episode ${epNum}`
+                    : rawTitle.replace(new RegExp(`^${epNum}[.\\-\\s]+`), "");
+
                 return (
                   <div
                     key={ep.id}
@@ -1380,7 +1451,7 @@ function StremioDetailsView({
                         id: ep.id,
                         season: selectedSeason,
                         number: epNum,
-                        title: ep.title || ep.name,
+                        title: cleanTitle,
                       });
                       void fetchStreamsForTarget(ep.id);
                     }}
@@ -1399,8 +1470,8 @@ function StremioDetailsView({
                       }}
                     />
                     <div className="episode-info">
-                      <strong>{ep.title || ep.name || `Episode ${epNum}`}</strong>
-                      {ep.released && <small>{ep.released}</small>}
+                      <strong>{cleanTitle}</strong>
+                      {ep.released && <small>{formatAirDate(ep.released)}</small>}
                       <p>{ep.overview || ep.description || "Episode details"}</p>
                     </div>
                     <Button
@@ -2160,8 +2231,10 @@ function LibraryView() {
                         <div className="card-footer-actions">
                           <small>{item.year ?? item.type}</small>
                           <button
-                            className="text-button"
+                            type="button"
+                            className="text-button remove-btn"
                             onClick={(e) => {
+                              e.preventDefault();
                               e.stopPropagation();
                               handleRemoveWatchlist(item.id, e);
                             }}
