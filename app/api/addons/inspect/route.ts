@@ -17,7 +17,10 @@ export async function POST(request: NextRequest) {
     }
     throw new AddonRequestError("UNSUPPORTED_ADDON", "This is not a valid Stremio manifest or CloudStream repository.");
   } catch (error) {
-    const known = error instanceof AddonRequestError ? error : new AddonRequestError("ADDON_INSPECTION_FAILED", "The addon could not be inspected.", 502);
-    return NextResponse.json({ code: known.code, message: known.message }, { status: known.status });
+    const message = error instanceof Error ? error.message : "The addon could not be inspected.";
+    const status = error instanceof AddonRequestError ? error.status : 502;
+    const code = error instanceof AddonRequestError ? error.code : "ADDON_INSPECTION_FAILED";
+    return NextResponse.json({ code, message }, { status });
   }
 }
+
