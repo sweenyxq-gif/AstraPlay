@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://astraplay.onrender.com"),
   title: { default: "AstraPlay — Modern Streaming Aggregator", template: "%s — AstraPlay" },
-  description: "A decentralized, source-agnostic streaming interface for films, series, and public domain cinema.",
+  description: "A decentralized, source-agnostic streaming interface for films, series, and open media.",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },

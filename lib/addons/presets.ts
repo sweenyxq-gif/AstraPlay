@@ -40,19 +40,6 @@ export const PRESET_ADDONS: StoredAddon[] = [
   },
   {
     kind: "stremio",
-    id: "org.astraplay.publicdomain",
-    name: "Public Domain & Open Cinema",
-    version: "2.0.0",
-    description: "Verified genuine public domain classics, open-source cinema (Blender Open Projects), and Internet Archive films.",
-    url: "https://astraplay.onrender.com/api/addons/publicdomain/manifest.json",
-    capabilities: ["catalog", "meta", "stream"],
-    enabled: true,
-    catalogs: [
-      { type: "movie", id: "public_domain", name: "Public Domain Feature Films" },
-    ],
-  },
-  {
-    kind: "stremio",
     id: "com.stremio.HdHub",
     name: "HdHub Multi-Quality Streams",
     version: "1.0.7",
@@ -80,7 +67,6 @@ export function getInstalledAddons(): StoredAddon[] {
   try {
     const raw = localStorage.getItem("astraplay:addons");
     if (!raw) {
-      // Seed default recommended addons on initial setup
       localStorage.setItem("astraplay:addons", JSON.stringify(PRESET_ADDONS));
       return PRESET_ADDONS;
     }
@@ -90,26 +76,16 @@ export function getInstalledAddons(): StoredAddon[] {
       return PRESET_ADDONS;
     }
 
-    // Auto-migrate legacy public domain preset if misconfigured to Cinemeta
-    let modified = false;
-    parsed = parsed.map((addon) => {
-      if (
-        addon.id === "org.publicdomain.movies" ||
-        addon.id === "org.astraplay.publicdomain" ||
-        addon.name.toLowerCase().includes("public domain")
-      ) {
-        if (
-          addon.url.includes("v3-cinemeta.strem.io") ||
-          addon.catalogs?.[0]?.id === "top"
-        ) {
-          modified = true;
-          return PRESET_ADDONS.find((a) => a.id === "org.astraplay.publicdomain")!;
-        }
-      }
-      return addon;
-    });
+    // Purge any public domain addon from storage
+    const beforeCount = parsed.length;
+    parsed = parsed.filter(
+      (addon) =>
+        addon.id !== "org.publicdomain.movies" &&
+        addon.id !== "org.astraplay.publicdomain" &&
+        !addon.name.toLowerCase().includes("public domain")
+    );
 
-    if (modified) {
+    if (parsed.length !== beforeCount) {
       localStorage.setItem("astraplay:addons", JSON.stringify(parsed));
     }
     return parsed;

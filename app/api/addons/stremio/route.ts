@@ -33,50 +33,6 @@ export async function POST(request: NextRequest) {
         "Unsupported addon resource."
       );
     }
-    const manifestStr = String(body.manifestUrl || "");
-    const idStr = String(body.id || "");
-    const isPublicDomain =
-      manifestStr.includes("publicdomain") ||
-      idStr.startsWith("pd_") ||
-      idStr.startsWith("open_") ||
-      idStr === "public_domain";
-
-    if (isPublicDomain) {
-      const {
-        getPublicDomainMetas,
-        getPublicDomainMeta,
-        getPublicDomainStreams,
-      } = await import("@/lib/addons/publicdomain-data");
-
-      if (resource === "catalog") {
-        let skip = 0;
-        let query: string | undefined = undefined;
-        if (typeof body.extra === "string") {
-          const matchSkip = body.extra.match(/skip=(\d+)/);
-          if (matchSkip) skip = parseInt(matchSkip[1], 10);
-          const matchSearch = body.extra.match(/search=([^&]+)/);
-          if (matchSearch) query = decodeURIComponent(matchSearch[1]);
-        } else if (typeof body.extra === "object" && body.extra !== null) {
-          const ex = body.extra as Record<string, unknown>;
-          if (ex.skip) skip = parseInt(String(ex.skip), 10) || 0;
-          if (ex.search) query = String(ex.search);
-        }
-        const metas = getPublicDomainMetas(skip, query);
-        return NextResponse.json({ metas });
-      }
-      if (resource === "meta") {
-        const meta = getPublicDomainMeta(idStr);
-        return NextResponse.json({ meta });
-      }
-      if (resource === "stream") {
-        const streams = getPublicDomainStreams(idStr);
-        return NextResponse.json({ streams });
-      }
-      if (resource === "subtitles") {
-        return NextResponse.json({ subtitles: [] });
-      }
-    }
-
     const manifestUrl = validateRemoteAddonUrl(body.manifestUrl as string);
     const base = new URL("./", manifestUrl);
 

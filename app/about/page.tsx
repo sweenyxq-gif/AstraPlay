@@ -70,15 +70,6 @@ export default function AboutPage() {
               </div>
             </div>
           </section>
-
-          <section className="legal-section">
-            <h2>Public Domain & Open Cinema Commitment</h2>
-            <p>
-              AstraPlay actively maintains an open, verified index of genuine public domain and creative
-              commons cinema—including restored silent classics, foundational film noir, and open-source
-              creative productions from the Blender Open Movie Foundation.
-            </p>
-          </section>
         </div>
       </main>
 

@@ -1250,7 +1250,7 @@ function StremioDetailsView({
         name: "Open Cinema CDN",
         title: "Standard Web Stream (1080p)",
         url: fallbackUrl,
-        addonName: "Public Domain & Open Cinema",
+        addonName: "Open Cinema CDN",
         quality: "1080p",
       });
     }
@@ -1674,7 +1674,7 @@ function RemoteWatchView({
           name: "Open Cinema CDN",
           title: "1080p Web Stream",
           url: SAMPLE_FALLBACK_STREAMS[mediaId] ?? SAMPLE_FALLBACK_STREAMS.default,
-          addonName: "Public Domain Streams",
+          addonName: "Open Cinema CDN",
         };
       }
 
