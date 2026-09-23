@@ -5,28 +5,9 @@ import { fileURLToPath } from "node:url";
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 const port = process.env.PORT || "10000";
 
-await import("./sites-env.mjs");
+const vinextCli = path.join(projectRoot, "node_modules/vinext/dist/cli.js");
 
-const wranglerBin = path.join(projectRoot, "node_modules/wrangler/bin/wrangler.js");
-const wranglerConfig = path.join(projectRoot, "dist/server/wrangler.json");
-
-const args = [
-  wranglerBin,
-  "dev",
-  "--config",
-  wranglerConfig,
-  "--local",
-  "--persist-to",
-  ".wrangler/state",
-  "--ip",
-  "0.0.0.0",
-  "--port",
-  port,
-  "--inspector-port",
-  "0",
-];
-
-const child = spawn(process.execPath, args, {
+const child = spawn(process.execPath, [vinextCli, "start", "--port", port, "--hostname", "0.0.0.0"], {
   cwd: projectRoot,
   stdio: "inherit",
   env: {
